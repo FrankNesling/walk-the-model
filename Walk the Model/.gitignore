@@ -478,3 +478,7 @@ FodyWeavers.xsd
 
 # libraries
 /glm
+
+# images
+*.jpg
+*.png
