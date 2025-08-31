@@ -482,3 +482,6 @@ FodyWeavers.xsd
 # images
 *.jpg
 *.png
+
+# obj
+/resources
