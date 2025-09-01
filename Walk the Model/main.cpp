@@ -5,18 +5,7 @@
 int walkthemodel(std::string objPath);
 
 
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-//{
-//    glViewport(0, 0, width, height);
-//}
-//
-//void processInput(GLFWwindow* window)
-//{
-//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-//        glfwSetWindowShouldClose(window, true);
-//}
-
-std::string objPath = "resources/bobrMickBlue/bobr_turm_mick_blue.obj";
+std::string objPath = "resources/Yoshi/Yoshi.obj";
 
 int main() {
     walkthemodel(objPath);
