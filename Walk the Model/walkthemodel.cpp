@@ -30,7 +30,7 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-int walkthemodel(string objPath)
+int walkthemodel(string objPath1, string objPath2)
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -77,11 +77,12 @@ int walkthemodel(string objPath)
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("vertexShader.vxs", "fragmentShader.frs");
+    Shader shader("vertexShader.vxs", "fragmentShader.frs");
 
     // load models
     // -----------
-    Model ourModel(objPath);
+    Model model1(objPath1);
+    Model model2(objPath2);
 
 
     // draw in wireframe
@@ -107,20 +108,21 @@ int walkthemodel(string objPath)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // don't forget to enable shader before setting uniforms
-        ourShader.use();
+        shader.use();
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        shader.setMat4("model", model);
+        model1.Draw(shader);
+        model2.Draw(shader);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
