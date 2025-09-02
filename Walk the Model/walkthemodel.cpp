@@ -30,6 +30,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// state
+bool noTexture = false;
+
 int walkthemodel(string objPath1, string objPath2)
 {
     // glfw: initialize and configure
@@ -82,7 +85,7 @@ int walkthemodel(string objPath1, string objPath2)
     // load models
     // -----------
     Model model1(objPath1);
-    Model model2(objPath2);
+    Model model2(objPath2, false, true);
 
 
     // draw in wireframe
@@ -122,7 +125,7 @@ int walkthemodel(string objPath1, string objPath2)
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         shader.setMat4("model", model);
         model1.Draw(shader);
-        model2.Draw(shader);
+        model2.Draw(shader, noTexture);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -156,6 +159,8 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+        noTexture = true;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -5,8 +5,8 @@
 int walkthemodel(std::string objPath1, std::string objPath2);
 
 
-std::string objPath1 = "resources/Yoshi/Yoshi.obj";
-std::string objPath2 = "resources/Kleinklotz/Kleinklotz.obj";
+std::string objPath1 = "resources/bobr_turm_mick_blue/bobr_turm_mick_blue.obj";
+std::string objPath2 = "resources/Urs/Urs.obj";
 
 
 int main() {
