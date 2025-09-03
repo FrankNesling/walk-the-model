@@ -33,7 +33,7 @@ float lastFrame = 0.0f;
 // state
 bool noTexture = false;
 
-int walkthemodel(string objPath1, string objPath2)
+int walkthemodel(string objPath1, string objPath2, string objPath3)
 {
     // glfw: initialize and configure
     // ------------------------------
@@ -84,12 +84,30 @@ int walkthemodel(string objPath1, string objPath2)
 
     // load models
     // -----------
-    Model model1(objPath1);
-    Model model2(objPath2, false, true);
+    Model tower(objPath1);
+    Model urs(objPath2);
+    Model kapelle(objPath3);
 
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // LET'S BUILD A CITY
+    // tower
+    glm::mat4 towerMtx = glm::mat4(1.0f);
+    towerMtx = glm::translate(towerMtx, glm::vec3(0.0f, 0.0f, 0.0f));
+    towerMtx = glm::scale(towerMtx, glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // urs
+    glm::mat4 ursMtx = glm::mat4(1.0f);
+    ursMtx = glm::translate(ursMtx, glm::vec3(0.0f, -5.0f, 0.0f));
+    ursMtx = glm::scale(ursMtx, glm::vec3(-1.0f, -1.0f, -1.0f));
+
+    // kapelle
+    glm::mat4 kapelleMtx = glm::mat4(1.0f);
+    kapelleMtx = glm::translate(kapelleMtx, glm::vec3(-15.0f, 5.0f, -30.0f));
+    kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
+
 
     // render loop
     // -----------
@@ -120,12 +138,14 @@ int walkthemodel(string objPath1, string objPath2)
         shader.setMat4("view", view);
 
         // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        shader.setMat4("model", model);
-        model1.Draw(shader);
-        model2.Draw(shader, noTexture);
+        shader.setMat4("model", towerMtx);
+        tower.Draw(shader);
+
+        shader.setMat4("model", ursMtx);
+        urs.Draw(shader, noTexture);
+
+        shader.setMat4("model", kapelleMtx);
+        kapelle.Draw(shader);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

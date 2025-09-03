@@ -31,12 +31,10 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
-    bool flip;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, bool gamma = false, bool flip = false) : gammaCorrection(gamma)
+    Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
     {
-        this->flip = flip;
         loadModel(path);
     }
 
@@ -100,7 +98,7 @@ private:
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
             vector.x = mesh->mVertices[i].x;
-            vector.y = mesh->mVertices[i].y * (flip ? -1.0 : 1.0);
+            vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
             vertex.Position = vector;
             // normals
