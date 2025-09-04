@@ -81,6 +81,8 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     // build and compile shaders
     // -------------------------
     Shader shader("vertexShader.vxs", "fragmentShader.frs");
+    Shader crosshairShader("crosshairVertexShader.vxs", "crosshairFragmentShader.frs");
+
 
     // load models
     // -----------
@@ -107,6 +109,44 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     glm::mat4 kapelleMtx = glm::mat4(1.0f);
     kapelleMtx = glm::translate(kapelleMtx, glm::vec3(-15.0f, 5.0f, -30.0f));
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
+
+
+    // CROSSHAIR
+    float vertices[] = {
+        // Horizontal line
+        -10.0f,  0.0f,
+         10.0f,  0.0f,
+         // Vertical line
+           0.0f, -10.0f,
+           0.0f,  10.0f
+    };
+
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // crosshair projection
+    glm::mat4 projection = glm::ortho(
+        -(float)SCR_WIDTH / 2.0f, (float)SCR_WIDTH / 2.0f,
+        -(float)SCR_HEIGHT / 2.0f, (float)SCR_HEIGHT / 2.0f,
+        -1.0f, 1.0f
+    );
+
+    crosshairShader.use();
+    crosshairShader.setMat4("projection", projection);
+
+
 
 
     // render loop
@@ -146,6 +186,15 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
         shader.setMat4("model", kapelleMtx);
         kapelle.Draw(shader);
+
+
+        // crosshair
+        crosshairShader.use();
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_LINES, 0, 4);
+
+        glBindVertexArray(0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -221,4 +270,3 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
-

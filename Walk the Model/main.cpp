@@ -10,7 +10,7 @@ std::string objPath1 = "resources/Tower/Tower.obj";
 std::string objPath2 = "resources/Urs/Urs.obj";
 std::string objPath3 = "resources/Kapelle/Kapelle.obj";
 
-// TODO: clipping
+// TODO: clipping of scene bc. of camera
 
 int main() {
     walkthemodel(objPath1, objPath2, objPath3);
