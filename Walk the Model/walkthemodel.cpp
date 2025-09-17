@@ -82,6 +82,8 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     // -------------------------
     Shader shader("vertexShader.vxs", "fragmentShader.frs");
     Shader crosshairShader("crosshairVertexShader.vxs", "crosshairFragmentShader.frs");
+    Shader lineShader("lineVertexShader.vxs", "lineFragmentShader.frs");
+
 
 
     // load models
@@ -110,6 +112,24 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     kapelleMtx = glm::translate(kapelleMtx, glm::vec3(-15.0f, 5.0f, -30.0f));
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
 
+    // LINE
+    float lineVertices[] = {
+    0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, -5.0f
+    };
+
+    unsigned int VAO_Lines, VBO_Lines;
+    glGenVertexArrays(1, &VAO_Lines);
+    glGenBuffers(1, &VBO_Lines);
+
+    glBindVertexArray(VAO_Lines);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Lines);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glLineWidth(20.0f); // Set the line width
 
     // CROSSHAIR
     float vertices[] = {
@@ -145,9 +165,6 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
     crosshairShader.use();
     crosshairShader.setMat4("projection", projection);
-
-
-
 
     // render loop
     // -----------
@@ -194,8 +211,18 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         glBindVertexArray(VAO);
         glDrawArrays(GL_LINES, 0, 4);
 
-        glBindVertexArray(0);
 
+        // lines
+
+        lineShader.use();
+        glm::mat4 projectionLines = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        lineShader.setMat4("projection", projectionLines);
+
+        glBindVertexArray(VAO_Lines);
+        glDrawArrays(GL_LINES, 0, 2);
+
+        // reset
+        glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
