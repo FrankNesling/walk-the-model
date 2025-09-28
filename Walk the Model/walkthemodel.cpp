@@ -40,7 +40,7 @@ float lastFrame = 0.0f;
 
 // state
 bool noTexture = false;
-bool activateLine = false;
+bool leftMouseButtonWasClicked = false;
 
 int walkthemodel(string objPath1, string objPath2, string objPath3)
 {
@@ -122,22 +122,6 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
 
     // PROJECTILE
-    //float projectileVertices[] = {
-    //0.0f, 0.0f, 3.0f,
-    //0.0f, 0.0f, -2.0f
-    //};
-
-    //unsigned int VAO_projectiles, VBO_projectiles;
-    //glGenVertexArrays(1, &VAO_projectiles);
-    //glGenBuffers(1, &VBO_projectiles);
-
-    //glBindVertexArray(VAO_projectiles);
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO_projectiles);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(projectileVertices), projectileVertices, GL_STATIC_DRAW);
-
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-
     unsigned int projectileVAO, projectileVBO;
 
     glGenVertexArrays(1, &projectileVAO);
@@ -295,11 +279,15 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
         noTexture = true;
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        leftMouseButtonWasClicked = true;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE && leftMouseButtonWasClicked) {
         // create new projectil at current camera
         glm::vec3 start = camera.Position;
         glm::vec3 end = camera.Position + camera.Front * projectileLength;
         projectiles.push_back({ start, end });
+
+        leftMouseButtonWasClicked = false;
     }
 }
 
