@@ -114,8 +114,8 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
     // LINE
     float lineVertices[] = {
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, -5.0f
+    0.0f, 0.0f, 3.0f,
+    0.0f, 0.0f, -2.0f
     };
 
     unsigned int VAO_Lines, VBO_Lines;
@@ -129,9 +129,9 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glLineWidth(20.0f); // Set the line width
-
     // CROSSHAIR
+    glLineWidth(2.0f);
+
     float vertices[] = {
         // Horizontal line
         -10.0f,  0.0f,
@@ -185,7 +185,7 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // don't forget to enable shader before setting uniforms
+        // enable shader before setting uniforms
         shader.use();
 
         // view/projection transformations
@@ -215,8 +215,11 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         // lines
 
         lineShader.use();
-        glm::mat4 projectionLines = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projectionLines = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         lineShader.setMat4("projection", projectionLines);
+
+        lineShader.setMat4("view", view);
+
 
         glBindVertexArray(VAO_Lines);
         glDrawArrays(GL_LINES, 0, 2);
