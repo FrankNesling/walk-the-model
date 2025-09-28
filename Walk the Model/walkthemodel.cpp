@@ -16,6 +16,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
+// projectiles
+struct Projectile {
+    glm::vec3 p0;
+    glm::vec3 p1;
+};
+std::vector<Projectile> projectiles;
+float projectileLength = 5.0f;
+
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -32,6 +40,7 @@ float lastFrame = 0.0f;
 
 // state
 bool noTexture = false;
+bool activateLine = false;
 
 int walkthemodel(string objPath1, string objPath2, string objPath3)
 {
@@ -82,7 +91,7 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     // -------------------------
     Shader shader("vertexShader.vxs", "fragmentShader.frs");
     Shader crosshairShader("crosshairVertexShader.vxs", "crosshairFragmentShader.frs");
-    Shader lineShader("lineVertexShader.vxs", "lineFragmentShader.frs");
+    Shader projectileShader("projectileVertexShader.vxs", "projectileFragmentShader.frs");
 
 
 
@@ -112,20 +121,36 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     kapelleMtx = glm::translate(kapelleMtx, glm::vec3(-15.0f, 5.0f, -30.0f));
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
 
-    // LINE
-    float lineVertices[] = {
-    0.0f, 0.0f, 3.0f,
-    0.0f, 0.0f, -2.0f
-    };
+    // PROJECTILE
+    //float projectileVertices[] = {
+    //0.0f, 0.0f, 3.0f,
+    //0.0f, 0.0f, -2.0f
+    //};
 
-    unsigned int VAO_Lines, VBO_Lines;
-    glGenVertexArrays(1, &VAO_Lines);
-    glGenBuffers(1, &VBO_Lines);
+    //unsigned int VAO_projectiles, VBO_projectiles;
+    //glGenVertexArrays(1, &VAO_projectiles);
+    //glGenBuffers(1, &VBO_projectiles);
 
-    glBindVertexArray(VAO_Lines);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_Lines);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
+    //glBindVertexArray(VAO_projectiles);
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO_projectiles);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(projectileVertices), projectileVertices, GL_STATIC_DRAW);
 
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+
+    unsigned int projectileVAO, projectileVBO;
+
+    glGenVertexArrays(1, &projectileVAO);
+    glGenBuffers(1, &projectileVBO);
+
+    // 2. Bind VAO
+    glBindVertexArray(projectileVAO);
+
+    // 3. Bind VBO (no data yet, just a placeholder)
+    glBindBuffer(GL_ARRAY_BUFFER, projectileVBO);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW); // empty initially
+
+    // 4. Define vertex attribute (position at location 0)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -212,17 +237,27 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         glDrawArrays(GL_LINES, 0, 4);
 
 
-        // lines
+        // projectile
+        std::vector<GLfloat> vertexData;
+        for (const auto& projectile : projectiles) {
+            vertexData.push_back(projectile.p0.x); vertexData.push_back(projectile.p0.y); vertexData.push_back(projectile.p0.z);
+            vertexData.push_back(projectile.p1.x); vertexData.push_back(projectile.p1.y); vertexData.push_back(projectile.p1.z);
+        }
 
-        lineShader.use();
-        glm::mat4 projectionLines = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        lineShader.setMat4("projection", projectionLines);
-
-        lineShader.setMat4("view", view);
+        glBindBuffer(GL_ARRAY_BUFFER, projectileVBO);
+        glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GLfloat), vertexData.data(), GL_DYNAMIC_DRAW);
 
 
-        glBindVertexArray(VAO_Lines);
-        glDrawArrays(GL_LINES, 0, 2);
+        projectileShader.use();
+        glm::mat4 projectionProjectile = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projectileShader.setMat4("projection", projectionProjectile);
+        projectileShader.setMat4("view", view);
+
+
+        glBindVertexArray(projectileVAO);
+        glDrawArrays(GL_LINES, 0, (GLsizei)(projectiles.size() * 2)); // two vertices per line
+        
+
 
         // reset
         glBindVertexArray(0);
@@ -260,6 +295,12 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
         noTexture = true;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        // create new projectil at current camera
+        glm::vec3 start = camera.Position;
+        glm::vec3 end = camera.Position + camera.Front * projectileLength;
+        projectiles.push_back({ start, end });
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
