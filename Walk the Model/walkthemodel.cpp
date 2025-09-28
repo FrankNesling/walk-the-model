@@ -24,6 +24,10 @@ struct Projectile {
 std::vector<Projectile> projectiles;
 float projectileLength = 5.0f;
 
+unsigned int projectileVAO, projectileVBO;
+size_t numVertices = 0;
+int maxProjectiles = 10;
+
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -122,19 +126,15 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
 
     // PROJECTILE
-    unsigned int projectileVAO, projectileVBO;
 
     glGenVertexArrays(1, &projectileVAO);
     glGenBuffers(1, &projectileVBO);
 
-    // 2. Bind VAO
     glBindVertexArray(projectileVAO);
 
-    // 3. Bind VBO (no data yet, just a placeholder)
     glBindBuffer(GL_ARRAY_BUFFER, projectileVBO);
-    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW); // empty initially
+    glBufferData(GL_ARRAY_BUFFER, 2 * maxProjectiles * 3 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 
-    // 4. Define vertex attribute (position at location 0)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -222,16 +222,6 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
 
         // projectile
-        std::vector<GLfloat> vertexData;
-        for (const auto& projectile : projectiles) {
-            vertexData.push_back(projectile.p0.x); vertexData.push_back(projectile.p0.y); vertexData.push_back(projectile.p0.z);
-            vertexData.push_back(projectile.p1.x); vertexData.push_back(projectile.p1.y); vertexData.push_back(projectile.p1.z);
-        }
-
-        glBindBuffer(GL_ARRAY_BUFFER, projectileVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(GLfloat), vertexData.data(), GL_DYNAMIC_DRAW);
-
-
         projectileShader.use();
         glm::mat4 projectionProjectile = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         projectileShader.setMat4("projection", projectionProjectile);
@@ -241,8 +231,6 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         glBindVertexArray(projectileVAO);
         glDrawArrays(GL_LINES, 0, (GLsizei)(projectiles.size() * 2)); // two vertices per line
         
-
-
         // reset
         glBindVertexArray(0);
 
@@ -256,6 +244,21 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void addProjectile(const glm::vec3& p0, const glm::vec3& p1) {
+    if (projectiles.size() <= maxProjectiles) {
+        projectiles.push_back({ p0, p1 });
+
+        GLfloat lineData[6] = {
+            p0.x, p0.y, p0.z,
+            p1.x, p1.y, p1.z
+        };
+
+        glBindBuffer(GL_ARRAY_BUFFER, projectileVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, numVertices * sizeof(GLfloat), sizeof(lineData), lineData);
+        numVertices += 6; // 6 floats per line (2 vertices × 3 coords)
+    }
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -285,7 +288,7 @@ void processInput(GLFWwindow* window)
         // create new projectil at current camera
         glm::vec3 start = camera.Position;
         glm::vec3 end = camera.Position + camera.Front * projectileLength;
-        projectiles.push_back({ start, end });
+        addProjectile(start, end);
 
         leftMouseButtonWasClicked = false;
     }
