@@ -126,7 +126,6 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     kapelleMtx = glm::scale(kapelleMtx, glm::vec3(1.5f, 1.5f, 1.5f));
 
     // PROJECTILE
-
     glGenVertexArrays(1, &projectileVAO);
     glGenBuffers(1, &projectileVBO);
 
@@ -174,6 +173,10 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
     crosshairShader.use();
     crosshairShader.setMat4("projection", projection);
+
+
+    // setup
+    float time = 1.0f;
 
     // render loop
     // -----------
@@ -224,8 +227,11 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         // projectile
         projectileShader.use();
         glm::mat4 projectionProjectile = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
         projectileShader.setMat4("projection", projectionProjectile);
         projectileShader.setMat4("view", view);
+        projectileShader.setFloat("translate", (1.0/200.0) * time);
+
 
 
         glBindVertexArray(projectileVAO);
@@ -238,6 +244,9 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        
+        ++time;
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
