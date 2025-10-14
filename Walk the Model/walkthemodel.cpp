@@ -230,6 +230,14 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
 
         projectileShader.setMat4("projection", projectionProjectile);
         projectileShader.setMat4("view", view);
+
+        if (projectiles.size() > 0) {
+            glm::vec3 direction = projectiles[0].p1 - projectiles[0].p0;
+            projectileShader.setVector4("direction", 1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        else {
+            projectileShader.setVector4("direction", 1.0f, 1.0f, 1.0f, 1.0f);
+        }
         projectileShader.setFloat("translate", (1.0/200.0) * time);
 
 

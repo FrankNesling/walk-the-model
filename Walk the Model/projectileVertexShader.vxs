@@ -4,8 +4,9 @@ layout (location = 0) in vec3 aPos;
 uniform mat4 projection;
 uniform mat4 view;
 uniform float translate;
+uniform vec4 direction;
 
 void main()
 {
-   gl_Position = projection * view * vec4(aPos.x + translate, aPos.y + translate, aPos.z + translate, 1.0);
+   gl_Position = projection * view * vec4(aPos.x + direction.x * translate, aPos.y + direction.y * translate, aPos.z + direction.z * translate, 1.0);
 }
