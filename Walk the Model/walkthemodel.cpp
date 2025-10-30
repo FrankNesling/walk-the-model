@@ -22,7 +22,7 @@ struct Projectile {
     glm::vec3 p1;
 };
 std::vector<Projectile> projectiles;
-float projectileLength = 5.0f;
+float projectileLength = 0.5f;
 
 unsigned int projectileVAO, projectileVBO;
 size_t numVertices = 0;
