@@ -231,19 +231,16 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         projectileShader.setMat4("projection", projectionProjectile);
         projectileShader.setMat4("view", view);
 
-        if (projectiles.size() > 0) {
-            glm::vec3 direction = projectiles[0].p1 - projectiles[0].p0;
-            projectileShader.setVector4("direction", 1.0f, 1.0f, 1.0f, 1.0f);
-        }
-        else {
-            projectileShader.setVector4("direction", 1.0f, 1.0f, 1.0f, 1.0f);
-        }
         projectileShader.setFloat("translate", (1.0/200.0) * time);
 
-
-
         glBindVertexArray(projectileVAO);
-        glDrawArrays(GL_LINES, 0, (GLsizei)(projectiles.size() * 2)); // two vertices per line
+
+
+        for (int i = 0; i < projectiles.size(); i++) {
+            glm::vec3 direction = projectiles[i].p1 - projectiles[i].p0;
+            projectileShader.setVector4("direction", direction.x, direction.y, direction.z, 1.0f);
+            glDrawArrays(GL_LINES, (i*2), 2); // two vertices per line
+        }
         
         // reset
         glBindVertexArray(0);
