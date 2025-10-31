@@ -141,12 +141,18 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
     glLineWidth(2.0f);
 
     float vertices[] = {
-        // Horizontal line
-        -10.0f,  0.0f,
-         10.0f,  0.0f,
-         // Vertical line
-           0.0f, -10.0f,
-           0.0f,  10.0f
+        // Horizontal upper line
+        -5.0f,  5.0f,
+         5.0f,  5.0f,
+        // Vertical right line
+        5.0f, -5.0f,
+        5.0f,  5.0f,
+        // Horizontal lower line
+        -5.0f,  -5.0f,
+         5.0f,  -5.0f,
+         // Vertical left line
+         -5.0f, -5.0f,
+         -5.0f,  5.0f
     };
 
     unsigned int VAO, VBO;
@@ -221,7 +227,7 @@ int walkthemodel(string objPath1, string objPath2, string objPath3)
         crosshairShader.use();
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_LINES, 0, 4);
+        glDrawArrays(GL_LINES, 0, 8);
 
 
         // projectile
